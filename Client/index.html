@@ -1,0 +1,69 @@
+
+<!doctype html>
+<html lang="en">
+  <script src='./dist/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js'> </script>
+  <head>
+    <title>It could be your ad</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="Login pagin" />
+    <meta name="author" content="RAS_T1" />
+    <link href="./dist/bootstrap-5.2.3-dist/css/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body>
+      <iframe style="width: 100%;" src="./dist/layout.html"></iframe>
+      <iframe id = 'miniframe'   style="width: 100%; "   frameborder="0" src="./dist/Ligin/login.html" ></iframe>
+      <div id='maintoast' class="toast">
+        <div class="toast-header">
+          <img id='maintoastimg' class="rounded me-2"/>
+          <strong id='maintoastcaption' class="me-auto"></strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+          <p id='maintoastmessage'></p>
+        </div>
+      </div>
+  </body>
+  
+  <script>
+    let actions = {
+      'scrollHeight': function (e){
+        document
+          .getElementById('miniframe')
+          .height = e;
+      },
+      // level: 0 - success, 1 - worning, 2 - error
+      'toast': function (e) {
+        document
+          .getElementById('maintoastimg')
+          .src = e.level === 0
+            ? "./images/success64x64.jpg"
+            : e.level === 1
+              ? "./images/warning64x64.jpg"
+              : "./images/error64x64.jpg"
+        document
+          .getElementById('maintoastcaption')
+          .innerHTML = e.caption;
+        document
+          .getElementById('maintoastmessage')
+          .innerHTML = e.message;
+        new bootstrap.Toast(
+          document
+            .getElementById('maintoast'))
+            .show();
+      }
+    };
+    let eventMethod = window.addEventListener
+			? "addEventListener"
+			: "attachEvent";
+	  let messageEvent = eventMethod === "attachEvent"
+		  ? "onmessage"
+		  : "message";
+      window[eventMethod](messageEvent, function (e) {
+      Object.keys(e.data)
+        .forEach(key => actions[key](e.data[key]));
+	  });
+
+  </script>
+
+</html>

@@ -1,0 +1,77 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>It could be your ad</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="Login pagin" />
+    <link href="../bootstrap-5.2.3-dist/css/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="mx-auto border bg-light col-xxl-4" style="padding: 3rem">
+      <div class="form-floating mb-3">
+        <input class="form-control" id="logininput" placeholder="Login" onchange="ChangeLogin(this.value)" >
+        <label for="floatingInput">Login</label>
+      </div>
+      <div class="form-floating mb-3">
+        <input type="password" class="form-control" placeholder="Password" onchange="ChangePassword(this.value)">
+        <label for="floatingPassword">Password</label>
+      </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit" onclick="Login(this)">Submit
+          <span id="spinerbutton" class="spinner-border-sm" ></span>
+        </button>
+      </div>
+    </div>
+  </body>
+  <script src="UserLogin.js"></script>
+  <script src="../Parametrs.js"></script>
+  <script src="../RestClient.js"></script>
+  <script src="../jquery-3.6.3/jquery-3.6.3.min.js"></script>
+  <script>
+      parent.postMessage({
+        'scrollHeight': document.body.scrollHeight
+      }, '*')
+      function ChangePassword(pass){
+        UserLogin.SetPassword(pass);
+      }
+      function ChangeLogin(loginName){
+        UserLogin.SetLoginName(loginName);
+      }
+      function Login(button){
+        let spiner = [...button.childNodes].filter(e => e?.id === 'spinerbutton')[0];
+        let spinerClassName = spiner.className;
+        spiner.className += ' spinner-border';
+        button.disabled = true;
+
+        RestClient.SentLoginUserToServer(UserLogin, function (code, response){
+          let level = 2;
+          let message;
+          if (code == 200) {
+            try{
+              let respObj = JSON.parse(JSON.parse(response).ret);
+              level = respObj.ResultCode === -1
+                ? 1
+                : 0;
+                message = 
+                  level === 1
+                  ? respObj.ResultMessage
+                  : "Authorization successful";
+            }
+            catch(error) {
+              message = `Internal error. try again later ${error}`;
+            }
+          }
+          parent.postMessage({
+            'toast': {
+            level: level,
+            caption: "Authorization",
+            message: message
+          }}, '*');
+          spiner.className = spinerClassName;
+          button.disabled = false;
+
+        });
+      }
+  </script>
+</html>
